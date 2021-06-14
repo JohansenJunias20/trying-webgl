@@ -46,7 +46,7 @@ var InitDemo = async function () {
     if (!gl) {
         alert("does not support webgl");
     }
-    mesh = new Mesh();
+    mesh = new Mesh(true, true);
     // mesh.init();
     mesh.createBoxVertices();
     await mesh.setupObject();

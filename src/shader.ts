@@ -45,7 +45,7 @@ export class Shader {
         this.Handle = <WebGLProgram>gl.createProgram();
         console.log("init handle")
         console.log(this.Handle)
-        console.log(typeof(this.Handle))
+        console.log(typeof (this.Handle))
         gl.attachShader(this.Handle, vertexShader);
         gl.attachShader(this.Handle, fragmentShader);
         gl.linkProgram(this.Handle);
@@ -91,11 +91,18 @@ export class Shader {
             gl.uniformMatrix4fv(test.key, true, data.toFloat32Array());
 
     }
+    setInt(uniformName: string, data: number) {
+        const gl = this.gl;
+        gl.useProgram(this.Handle);
+        var test = this.uniforms.find((uniform) => uniform.name == uniformName);
+        if (test)
+            gl.uniform1i(test?.key, data);
+    }
     getAttribLocation(name: string): number {
         console.log("getAttriblocation")
         console.log("handle:")
         console.log(this.Handle)
-        console.log(typeof(this.Handle));
+        console.log(typeof (this.Handle));
         // window.gl.getAttribLocation()
         return window.gl.getAttribLocation(this.Handle, name);
     }

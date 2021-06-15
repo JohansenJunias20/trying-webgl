@@ -3,31 +3,6 @@
 import { Shader } from './shader';
 // import { onRenderFrame } from './render';
 import { Mesh } from './mesh';
-import { textChangeRangeIsUnchanged } from 'typescript';
-
-var vertices = [
-    -1.0, 0.0, 0.0,
-    0.0, 1.0, 0.0,
-    1.0, 0.0, 0.0
-]
-var vertShader =
-    `
-precision mediump float;
-attribute vec3 aPosition;
-
-void main(){
-    gl_Position = vec4(aPosition,1.0);
-}
-
-`;
-var fragShader =
-    `
-precision mediump float;
-
-void main(){
-    gl_FragColor = vec4(0.4,0.9,0.3,1.0);
-}
-`;
 
 //global variable on window.____
 declare global {
@@ -46,10 +21,13 @@ var InitDemo = async function () {
     if (!gl) {
         alert("does not support webgl");
     }
-    mesh = new Mesh(true, true);
+    mesh = new Mesh(true,false);
     // mesh.init();
-    mesh.createBoxVertices();
+    // mesh.createBoxVertices();
+    await mesh.loadObjFrom("/public/resources/obj/fixbox.obj");
     await mesh.setupObject();
+    await mesh.setTexture("resources/texture/Grass_Block_TEX.png");
+    // await mesh.setTexture("resources/texture/box.png");
     // var shader: Shader = new Shader();
     // await shader.init("http://localhost:5500/shader/transform/shader.vert", "http://localhost:5500/shader/shader.frag");
     // // gl.vertext

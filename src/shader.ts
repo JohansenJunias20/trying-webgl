@@ -11,7 +11,6 @@ export class Shader {
     constructor() {
         this.Handle = WebGLProgram;
         this.uniforms = new Array<Uniform>();
-        console.log("costruct shader")
         // this.uniform = new unifo
     }
 
@@ -43,9 +42,6 @@ export class Shader {
         }
 
         this.Handle = <WebGLProgram>gl.createProgram();
-        console.log("init handle")
-        console.log(this.Handle)
-        console.log(typeof (this.Handle))
         gl.attachShader(this.Handle, vertexShader);
         gl.attachShader(this.Handle, fragmentShader);
         gl.linkProgram(this.Handle);
@@ -61,7 +57,6 @@ export class Shader {
 
         //get all uniforms of a shader.
         var uniformCount: number = gl.getProgramParameter(this.Handle, gl.ACTIVE_UNIFORMS);
-        console.log(`uniform count: ${uniformCount}`)
         for (let i = 0; i < uniformCount; i++) {
             var info: WebGLActiveInfo | null = gl.getActiveUniform(this.Handle, i);
             // name
@@ -99,10 +94,6 @@ export class Shader {
             gl.uniform1i(test?.key, data);
     }
     getAttribLocation(name: string): number {
-        console.log("getAttriblocation")
-        console.log("handle:")
-        console.log(this.Handle)
-        console.log(typeof (this.Handle));
         // window.gl.getAttribLocation()
         return window.gl.getAttribLocation(this.Handle, name);
     }

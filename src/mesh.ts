@@ -1,5 +1,5 @@
 import { Shader } from "./shader";
-import { Vector3, Matrix4 } from 'math.gl';
+import { Vector3, Matrix4, Vector2 } from 'math.gl';
 import toRad from "./helper/math";
 import Texture from "./texture";
 
@@ -16,6 +16,7 @@ export class Mesh {
     transform: Matrix4;
     texture: Texture;
     status: Status;
+    lengthVertice:number;
     constructor(texture = false, normal = false) {
         this.status = {
             texture,
@@ -28,8 +29,25 @@ export class Mesh {
         this.vbo = 0;
         this.transform = new Matrix4(); // sama seperti identity
         // this.transform.identity();
-        console.log(this.transform);
         this.texture = new Texture();
+
+        if (this.status.texture && this.status.normal) {
+            this.lengthVertice = 8;
+        }
+        else if (this.status.texture) {
+            this.lengthVertice = 5;
+            console.log("LENGTH VERTICE : ", 5)
+
+        }
+        else if (this.status.normal) {
+
+            this.lengthVertice = 6;
+        }
+        else {
+            this.lengthVertice = 3;
+            console.log("LENGTH VERTICE : ", 3)
+
+        }
         // this.shader.init();
 
     }
@@ -37,7 +55,6 @@ export class Mesh {
         const gl = window.gl;
         // await this.shader.init("/shader/transform/shader.vert", "/shader/shader.frag");
         await this.shader.init("/shader/texture/shader.vert", "/shader/texture/shader.frag");
-        await this.texture.init("/public/resources/texture/box.png");
 
         this.vao = gl.createVertexArray();
         gl.bindVertexArray(this.vao);
@@ -60,6 +77,10 @@ export class Mesh {
         // gl.enableVertexAttribArray(location);
         // gl.vertexAttribPointer(location,)
         // var location = gl.getattribl
+    }
+    async setTexture(urlTexture: string) {
+        await this.texture.init(urlTexture);
+
     }
     rotation: number = 0;
     createBoxVertices() {
@@ -109,40 +130,25 @@ export class Mesh {
         ]
     }
     layoutVertices() {
-        var lengthVertice: number;
-        if (this.status.texture && this.status.normal) {
-            lengthVertice = 8;
-        }
-        else if (this.status.texture) {
-            lengthVertice = 5;
-
-        }
-        else if (this.status.normal) {
-
-            lengthVertice = 6;
-        }
-        else {
-            lengthVertice = 3;
-
-        }
+     
         const gl = window.gl;
         var location = this.shader.getAttribLocation("aPosition");
         gl.enableVertexAttribArray(location);
-        gl.vertexAttribPointer(location, 3, gl.FLOAT, false, lengthVertice * Float32Array.BYTES_PER_ELEMENT, 0);
+        gl.vertexAttribPointer(location, 3, gl.FLOAT, false, this.lengthVertice * Float32Array.BYTES_PER_ELEMENT, 0);
 
         if (this.status.texture) {
 
             var location = this.shader.getAttribLocation("aTexCoord");
             gl.enableVertexAttribArray(location);
-            gl.vertexAttribPointer(location, 2, gl.FLOAT, false, lengthVertice * Float32Array.BYTES_PER_ELEMENT,
+            gl.vertexAttribPointer(location, 2, gl.FLOAT, false, this.lengthVertice * Float32Array.BYTES_PER_ELEMENT,
                 3 * Float32Array.BYTES_PER_ELEMENT);
         }
 
         if (this.status.normal) {
-            var location = this.shader.getAttribLocation("aTexCoord");
-            gl.enableVertexAttribArray(location);
-            gl.vertexAttribPointer(location, 2, gl.FLOAT, false, lengthVertice * Float32Array.BYTES_PER_ELEMENT,
-                3 * Float32Array.BYTES_PER_ELEMENT);
+            // var location = this.shader.getAttribLocation("aTexCoord");
+            // gl.enableVertexAttribArray(location);
+            // gl.vertexAttribPointer(location, 2, gl.FLOAT, false, this.lengthVertice * Float32Array.BYTES_PER_ELEMENT,
+            //     3 * Float32Array.BYTES_PER_ELEMENT);
         }
     }
     update(deltaTime: number) {
@@ -155,9 +161,9 @@ export class Mesh {
         var res = await fetch(url);
         var parsed = await res.text();
         var lines = parsed.split('\n');
-        var positions: Array<number> = [];
-        var textures: Array<number> = [];
-        var normals: Array<number> = [];
+        var positions: Array<Vector3> = [];
+        var textures: Array<Vector2> = [];
+        var normals: Array<Vector3> = [];
         var positionIndices: Array<number> = [];
         var textureIndices: Array<number> = [];
         var normalIndices: Array<number> = [];
@@ -165,25 +171,33 @@ export class Mesh {
             var words = line.split(' ');
             switch (words[0]) {
                 case "v":
-                    positions.push(+words[1]); // convert string to number
-                    positions.push(+words[2]);
-                    positions.push(+words[3]);
+                    var temp: Vector3;
+                    temp = new Vector3();
+                    temp.x = +words[1];
+                    temp.y = +words[2];
+                    temp.z = +words[3];
+                    positions.push(temp);
                     break;
                 case "vt":
-                    textures.push(+words[1]); // convert string to number
-                    textures.push(+words[2]);
+                    var temp1: Vector2;
+                    temp1 = new Vector2();
+                    temp1.x = +words[1];
+                    temp1.y = +words[2];
+                    textures.push(temp1); // convert string to number
                     break;
                 case "vn":
-                    normals.push(+words[1]); // convert string to number
-                    normals.push(+words[2]);
-                    normals.push(+words[3]);
+                    temp = new Vector3();
+                    temp.x = +words[1];
+                    temp.y = +words[2];
+                    temp.z = +words[3];
+                    normals.push(temp); // convert string to number
                     break;
                 case "f":
-                    words.slice(0, 1);
+                    words.splice(0, 1);
                     words.forEach(face => {
-                        positionIndices.push(+face.split("/")[0]);
-                        textureIndices.push(+face.split("/")[1]);
-                        normalIndices.push(+face.split("/")[2]);
+                        positionIndices.push(+face.split("/")[0] - 1);
+                        textureIndices.push(+face.split("/")[1] - 1);
+                        normalIndices.push(+face.split("/")[2] - 1);
                     })
 
 
@@ -194,22 +208,40 @@ export class Mesh {
         });
 
         this.vertices = [];
+        console.log(textureIndices.length)
+        console.log(positionIndices.length)
         for (let i = 0; i < positionIndices.length; i++) {
-            this.vertices.push(positions[positionIndices[i]]);
-            this.vertices.push(textures[textureIndices[i]]);
-            this.vertices.push(normals[normalIndices[i]]);
-        }
+            this.vertices.push(positions[positionIndices[i]].x);
+            this.vertices.push(positions[positionIndices[i]].y);
+            this.vertices.push(positions[positionIndices[i]].z);
 
-        // if()
+            this.vertices.push(textures[textureIndices[i]].x);
+            this.vertices.push(textures[textureIndices[i]].y);
+            // this.vertices.push(normals[normalIndices[i]].x);
+            // this.vertices.push(normals[normalIndices[i]].y);
+            // this.vertices.push(normals[normalIndices[i]].z);
+        }
+        // this.vertices = this.vertices.slice(0,90);
+        var result : Array<number>;
+        result = [];
+        console.log(this.vertices.length)
+        for (let i = 0; i < this.vertices.length; i++) {
+            if(i%5==0){
+                console.log(result) 
+                result = []
+            }
+            result.push(this.vertices[i]);
+            
+        }
     }
     render() {
         const gl = window.gl;
         gl.enable(gl.DEPTH_TEST);
         this.shader.use();
-        this.texture.use(0);
-        this.shader.setInt("indexTexture", 0);
-        this.shader.setMatrix4("transform", this.transform);
-        gl.drawArrays(gl.TRIANGLES, 0, this.vertices.length / 5);
+        // this.texture.use(0);
+        // this.shader.setInt("indexTexture", 0);
+        this.shader.setMatrix4("transform", this.transform.scale(0.3));
+        gl.drawArrays(gl.TRIANGLES, 0, this.vertices.length / this.lengthVertice);
 
     }
 }

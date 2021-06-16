@@ -245,17 +245,9 @@ export class Mesh {
         const gl = window.gl;
         gl.enable(gl.DEPTH_TEST);
         this.shader.use();
-        // this.texture.use(0);
-        // this.shader.setInt("indexTexture", 0);
         this.shader.setMatrix4("transform", this.transform);
-        // console.log(this.transform)
-        // this.shader.setMatrix4("transform", this.transform.scale(0.3));
-        // console.log(window.camera.getViewMatrix())
         this.shader.setMatrix4("view", window.camera.getViewMatrix());
-        // this.shader.setMatrix4("view",new Matrix4().identity());
         this.shader.setMatrix4("projection", window.camera.getProjectionMatrix());
-        // this.shader.setMatrix4("projection", new Matrix4().identity());
-        // this.shader.setMatrix4("projection", this.transform);
         gl.drawArrays(gl.TRIANGLES, 0, this.vertices.length / this.lengthVertice);
 
     }

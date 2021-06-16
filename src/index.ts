@@ -47,9 +47,9 @@ var InitDemo = async function () {
     mesh = new Mesh(true, false);
     // mesh.init();
     // mesh.createBoxVertices();
-    await mesh.loadObjFrom("/public/resources/obj/fixbox.obj");
+    await mesh.loadObjFrom("/resources/obj/fixbox.obj");
     await mesh.setupObject();
-    await mesh.setTexture("resources/texture/Grass_Block_TEX.png");
+    await mesh.setTexture("/resources/texture/Grass_Block_TEX.png");
     // await mesh.setTexture("resources/texture/box.png");
     // var shader: Shader = new Shader();
     // await shader.init("http://localhost:5500/shader/transform/shader.vert", "http://localhost:5500/shader/shader.frag");
@@ -88,7 +88,6 @@ function onRenderFrame(now: number) {
 function onUpdateFrame(deltaTime: number) {
     mesh.update(deltaTime);
     // console.log(window.camera.position)
-
     if (KeyboardState[87]) {
         console.log("w is pressed")
         window.camera.position.z += 0.1;

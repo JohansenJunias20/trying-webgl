@@ -16,6 +16,8 @@ export class Shader {
 
     async init(vertPath: string, fragPath: string) {
         const gl = this.gl;
+        console.log("fetching vert: ",vertPath);
+        console.log("fetching frag: ",fragPath);
         var response = await fetch(vertPath);
         var vertexCode: string = await response.text();
         response = await fetch(fragPath);

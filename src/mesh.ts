@@ -1,6 +1,6 @@
 import { Shader } from "./shader";
 import { Vector3, Matrix4, Vector2 } from 'math.gl';
-import toRad from "./helper/math";
+import { toRad } from "./helper/math";
 import Texture from "./texture";
 
 interface Status {
@@ -16,7 +16,8 @@ export class Mesh {
     transform: Matrix4;
     texture: Texture;
     status: Status;
-    lengthVertice:number;
+    lengthVertice: number;
+    position: Vector3;
     constructor(texture = false, normal = false) {
         this.status = {
             texture,
@@ -30,7 +31,7 @@ export class Mesh {
         this.transform = new Matrix4(); // sama seperti identity
         // this.transform.identity();
         this.texture = new Texture();
-
+        this.position = new Vector3(0, 0, 0);
         if (this.status.texture && this.status.normal) {
             this.lengthVertice = 8;
         }
@@ -54,7 +55,8 @@ export class Mesh {
     async setupObject() {
         const gl = window.gl;
         // await this.shader.init("/shader/transform/shader.vert", "/shader/shader.frag");
-        await this.shader.init("/shader/texture/shader.vert", "/shader/texture/shader.frag");
+        // await this.shader.init("/shader/texture/shader.vert", "/shader/texture/shader.frag");
+        await this.shader.init("/shader/camera/shader.vert", "/shader/texture/shader.frag");
 
         this.vao = gl.createVertexArray();
         gl.bindVertexArray(this.vao);
@@ -130,7 +132,7 @@ export class Mesh {
         ]
     }
     layoutVertices() {
-     
+
         const gl = window.gl;
         var location = this.shader.getAttribLocation("aPosition");
         gl.enableVertexAttribArray(location);
@@ -151,11 +153,16 @@ export class Mesh {
             //     3 * Float32Array.BYTES_PER_ELEMENT);
         }
     }
+
     update(deltaTime: number) {
         this.rotation += 0.001 * deltaTime;
+        // this.position.z += 0.0001 * deltaTime;
+        // this.position.z -= 0.01;
         this.transform.identity();
-        this.transform.rotateZ(this.rotation);
-        this.transform.rotateY(this.rotation);
+        // this.transform.scale(0.2);
+        // this.transform.rotateZ(this.rotation);
+        // this.transform.rotateY(this.rotation);
+        this.transform.translate(this.position);
     }
     async loadObjFrom(url: string) {
         var res = await fetch(url);
@@ -222,16 +229,16 @@ export class Mesh {
             // this.vertices.push(normals[normalIndices[i]].z);
         }
         // this.vertices = this.vertices.slice(0,90);
-        var result : Array<number>;
+        var result: Array<number>;
         result = [];
         console.log(this.vertices.length)
         for (let i = 0; i < this.vertices.length; i++) {
-            if(i%5==0){
-                console.log(result) 
+            if (i % 5 == 0) {
+                console.log(result)
                 result = []
             }
             result.push(this.vertices[i]);
-            
+
         }
     }
     render() {
@@ -240,7 +247,15 @@ export class Mesh {
         this.shader.use();
         // this.texture.use(0);
         // this.shader.setInt("indexTexture", 0);
-        this.shader.setMatrix4("transform", this.transform.scale(0.3));
+        this.shader.setMatrix4("transform", this.transform);
+        // console.log(this.transform)
+        // this.shader.setMatrix4("transform", this.transform.scale(0.3));
+        // console.log(window.camera.getViewMatrix())
+        this.shader.setMatrix4("view", window.camera.getViewMatrix());
+        // this.shader.setMatrix4("view",new Matrix4().identity());
+        this.shader.setMatrix4("projection", window.camera.getProjectionMatrix());
+        // this.shader.setMatrix4("projection", new Matrix4().identity());
+        // this.shader.setMatrix4("projection", this.transform);
         gl.drawArrays(gl.TRIANGLES, 0, this.vertices.length / this.lengthVertice);
 
     }

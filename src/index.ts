@@ -3,25 +3,48 @@
 import { Shader } from './shader';
 // import { onRenderFrame } from './render';
 import { Mesh } from './mesh';
+import Camera from './camera';
+import { Matrix4, Vector3 } from 'math.gl';
 
 //global variable on window.____
 declare global {
 
     interface Window {
         gl: WebGL2RenderingContext;
+        camera: Camera;
     }
 }
 var mesh: Mesh;
+var KeyboardState: any = {};
+
+// var camera: Camera;
 var InitDemo = async function () {
 
     var canvas = <HTMLCanvasElement>document.getElementById("game-surface");
-    /** @type {WebGL2RenderingContext} */
+    // console.log({width:canvas.width,height:canvas.height})
+
+    document.onkeydown = function (e) {
+        e = e || window.event;
+        // pressed.
+        KeyboardState[e.keyCode] = true;
+        // console.log(e);
+    }
+
+    document.onkeyup = function (e) {
+        e = e || window.event;
+        delete KeyboardState[e.keyCode];
+    }
+
+
+    window.camera = new Camera(new Vector3(0, 0, 0), canvas.width / canvas.height);
+    // camera = new Camera(new Vector3(0, 0, -1), canvas.width / canvas.height);
+
     window.gl = <WebGL2RenderingContext>canvas.getContext('webgl2');
     const gl = window.gl;
     if (!gl) {
         alert("does not support webgl");
     }
-    mesh = new Mesh(true,false);
+    mesh = new Mesh(true, false);
     // mesh.init();
     // mesh.createBoxVertices();
     await mesh.loadObjFrom("/public/resources/obj/fixbox.obj");
@@ -47,6 +70,7 @@ var InitDemo = async function () {
 
 }
 var then = 0;
+
 function onRenderFrame(now: number) {
     const deltaTime = now - then;
     then = now;
@@ -63,6 +87,22 @@ function onRenderFrame(now: number) {
 }
 function onUpdateFrame(deltaTime: number) {
     mesh.update(deltaTime);
+    // console.log(window.camera.position)
+
+    if (KeyboardState[87]) {
+        console.log("w is pressed")
+        window.camera.position.z += 0.1;
+        // console.log(window.camera.getProjectionMatrix())
+        console.log({ cameraPositon: window.camera.position, lookingAt: new Vector3(window.camera.position).add(window.camera.front), up: window.camera.up })
+        // console.log(window.camera.position)
+    }
+    if (KeyboardState[83]) {
+        console.log("s is pressed")
+        window.camera.position.z -= 0.1;
+        // console.log(window.camera.getViewMatrix())
+        // console.log(window.camera.position)
+
+    }
     // console.log(deltaTime)
 }
 InitDemo();

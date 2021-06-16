@@ -57,13 +57,16 @@ export class Shader {
 
         //get all uniforms of a shader.
         var uniformCount: number = gl.getProgramParameter(this.Handle, gl.ACTIVE_UNIFORMS);
+
         for (let i = 0; i < uniformCount; i++) {
             var info: WebGLActiveInfo | null = gl.getActiveUniform(this.Handle, i);
             // name
             if (info?.name)
-                var key = gl.getUniformLocation(this.Handle, "transform");
-            else
+                var key = gl.getUniformLocation(this.Handle, info.name);
+            else{
                 continue;
+
+            }
 
             if (key)
                 this.uniforms.push({
@@ -82,8 +85,9 @@ export class Shader {
         gl.useProgram(this.Handle);
         // console.log(data.toFloat32Array());
         var test = this.uniforms.find((uniform) => uniform.name == uniformName)
-        if (test)
+        if (test) {
             gl.uniformMatrix4fv(test.key, true, data.toFloat32Array());
+        }
 
     }
     setInt(uniformName: string, data: number) {

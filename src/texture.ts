@@ -1,6 +1,5 @@
 // import gl from "./gl";
 
-import gl from "./gl";
 
 function loadImage(imageUrl: string): Promise<HTMLImageElement | string> {
     return new Promise((res, rej) => {
@@ -10,6 +9,7 @@ function loadImage(imageUrl: string): Promise<HTMLImageElement | string> {
             image.src = imageUrl;
             image.onload = function () {
                 res(image);
+                
             }
         }
         catch (exception) {

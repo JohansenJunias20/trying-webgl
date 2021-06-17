@@ -34,7 +34,7 @@ document.addEventListener("pointerlockchange", lockChangeAlert, false);
 
 // var camera: Camera;
 var InitDemo = async function () {
-
+    alert("please use W/A/S/D to move camera and left click to the canvas for camera rotation")
     var canvas = <HTMLCanvasElement>document.getElementById("game-surface");
     // console.log({width:canvas.width,height:canvas.height})
     // canvas.style.cursor = "none";

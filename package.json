@@ -18,7 +18,9 @@
   },
   "homepage": "https://github.com/JohansenJunias20/trying-webgl#readme",
   "dependencies": {
+    "@types/jest": "^26.0.23",
     "@types/webgl2": "0.0.6",
+    "jest": "^27.0.4",
     "math.gl": "^3.4.3",
     "ts-loader": "^9.2.3",
     "typescript": "^4.3.2",

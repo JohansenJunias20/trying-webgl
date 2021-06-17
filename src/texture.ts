@@ -1,7 +1,7 @@
 // import gl from "./gl";
 
 
-function loadImage(imageUrl: string): Promise<HTMLImageElement | string> {
+export function loadImage(imageUrl: string): Promise<HTMLImageElement | string> {
     return new Promise((res, rej) => {
         try {
 

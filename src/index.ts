@@ -4,7 +4,7 @@ import { Shader } from './shader';
 // import { onRenderFrame } from './render';
 import { Mesh } from './mesh';
 import Camera from './camera';
-import { Matrix4, Vector3 } from 'math.gl';
+import { Matrix4, Vector2, Vector3 } from 'math.gl';
 
 //global variable on window.____
 declare global {
@@ -16,20 +16,38 @@ declare global {
 }
 var mesh: Mesh;
 var KeyboardState: any = {};
+var mouseMove = false;
+var mouseMovement = new Vector2(0, 0);
+function lockChangeAlert() {
+    document.onmousemove = (e) => {
+        // mospos.x = e.clientX;
+        // mospos.y = e.clientY;
+        // console.log(e)
+        // console.log({e})
+        mouseMovement.x = e.movementX* 0.5;
+        mouseMovement.y = e.movementY* 0.5;
+        mouseMove = true;
+        // console.log("mose move inside locking state")
+    }
+}
+document.addEventListener("pointerlockchange", lockChangeAlert, false);
 
 // var camera: Camera;
 var InitDemo = async function () {
 
     var canvas = <HTMLCanvasElement>document.getElementById("game-surface");
     // console.log({width:canvas.width,height:canvas.height})
-
+    // canvas.style.cursor = "none";
+    canvas.onclick = function () {
+        canvas.requestPointerLock();
+    }
+    // canvas.requestPointerLock();
     document.onkeydown = function (e) {
         e = e || window.event;
         // pressed.
         KeyboardState[e.keyCode] = true;
-        // console.log(e);
+        console.log(e.keyCode);
     }
-
     document.onkeyup = function (e) {
         e = e || window.event;
         delete KeyboardState[e.keyCode];
@@ -37,7 +55,6 @@ var InitDemo = async function () {
 
 
     window.camera = new Camera(new Vector3(0, 0, 0), canvas.width / canvas.height);
-    // camera = new Camera(new Vector3(0, 0, -1), canvas.width / canvas.height);
 
     window.gl = <WebGL2RenderingContext>canvas.getContext('webgl2');
     const gl = window.gl;
@@ -45,27 +62,9 @@ var InitDemo = async function () {
         alert("does not support webgl");
     }
     mesh = new Mesh(true, false);
-    // mesh.init();
-    // mesh.createBoxVertices();
     await mesh.loadObjFrom("/resources/obj/fixbox.obj");
     await mesh.setupObject();
     await mesh.setTexture("/resources/texture/Grass_Block_TEX.png");
-    // await mesh.setTexture("resources/texture/box.png");
-    // var shader: Shader = new Shader();
-    // await shader.init("http://localhost:5500/shader/transform/shader.vert", "http://localhost:5500/shader/shader.frag");
-    // // gl.vertext
-    // ;
-    // var vao = gl.createVertexArray();
-    // gl.bindVertexArray(vao);
-    // var vbo = gl.createBuffer();
-    // gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-
-    // var location = gl.getAttribLocation(shader.Handle, "aPosition");
-    // gl.enableVertexAttribArray(location);
-    // gl.vertexAttribPointer(location, 3, gl.FLOAT, false, 3 * Float32Array.BYTES_PER_ELEMENT, 0);
-
-    // shader.use(gl);
     onRenderFrame(then);
 
 }
@@ -87,21 +86,52 @@ function onRenderFrame(now: number) {
 }
 function onUpdateFrame(deltaTime: number) {
     mesh.update(deltaTime);
-    // console.log(window.camera.position)
+    const cameraSpeed: number = 0.01;
     if (KeyboardState[87]) {
-        console.log("w is pressed")
-        window.camera.position.z += 0.1;
-        // console.log(window.camera.getProjectionMatrix())
-        console.log({ cameraPositon: window.camera.position, lookingAt: new Vector3(window.camera.position).add(window.camera.front), up: window.camera.up })
-        // console.log(window.camera.position)
+        // console.log(typeof(cameraSpeed * deltaTime))
+        // console.log(new Vector3(window.camera.front))
+        // console.log(new Vector3(window.camera.front).multiply(cameraSpeed * deltaTime))
+        // var test = new Vector3(window.camera.front).multiplyVectors(cameraSpeed * deltaTime);
+        window.camera.position.add(new Vector3(window.camera.front).multiplyByScalar(cameraSpeed * deltaTime));
+        // console.log({ cameraPositon: window.camera.position, lookingAt: new Vector3(window.camera.position).add(window.camera.front), up: window.camera.up })
     }
     if (KeyboardState[83]) {
-        console.log("s is pressed")
-        window.camera.position.z -= 0.1;
-        // console.log(window.camera.getViewMatrix())
-        // console.log(window.camera.position)
+        // window.camera.position.z -= cameraSpeed * deltaTime;
+        window.camera.position.sub(new Vector3(window.camera.front).multiplyByScalar(cameraSpeed * deltaTime));
 
     }
-    // console.log(deltaTime)
+    if (KeyboardState[65]) {
+        window.camera.position.sub(new Vector3(window.camera.right).multiplyScalar(cameraSpeed * deltaTime));
+
+    }
+    if (KeyboardState[68]) {
+        window.camera.position.add(new Vector3(window.camera.right).multiplyScalar(cameraSpeed * deltaTime));
+        // window.camera.position.x -= cameraSpeed * deltaTime;
+
+    }
+
+    const sensitivity = 0.6;
+    if (firstTime) {
+        lastMousePosition = new Vector2(mospos.x, mospos.y);
+    }
+    else {
+        if (mouseMove) {
+
+            var deltaX: number;
+            var deltaY: number;
+            deltaX = mospos.x - lastMousePosition.x;
+            deltaY = mospos.y - lastMousePosition.y;
+            lastMousePosition = new Vector2(mospos.x, mospos.y)
+            window.camera.Yaw += mouseMovement.x * sensitivity;
+            // window.camera.Yaw += deltaX * sensitivity;
+            window.camera.Pitch += mouseMovement.y * sensitivity;
+            // window.camera.Pitch += deltaY * sensitivity;
+            mouseMove = false;
+        }
+    }
 }
+var mospos = new Vector2(0, 0);
+var firstTime = false;
+var lastMousePosition = new Vector2(0, 0);
+
 InitDemo();

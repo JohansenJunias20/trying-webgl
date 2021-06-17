@@ -60,12 +60,12 @@ export default class Camera {
     }
     updateVectors(): void {
         this.front.x = Math.cos(this.pitch) * Math.cos(this.yaw);
-        this.front.y = Math.cos(this.pitch);
+        this.front.y = Math.sin(this.pitch);
         this.front.z = Math.cos(this.pitch) * Math.sin(this.yaw);
 
         this.front = new Vector3(this.front).normalize();
         this.right = new Vector3(this.front).cross(new Vector3(0, 1, 0));
-        this.up = new Vector3(this.up).cross(this.front);
+        this.up = new Vector3(this.right).cross(this.front).normalize();
 
     }
 }

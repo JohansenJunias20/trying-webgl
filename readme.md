@@ -19,11 +19,11 @@ learning WEBGL and TypeScript to beat [Three.JS](https://threejs.org/) :v
 
 ## dependencies that i use:
 ---
-**@types/webgl2** webgl2 for typescript
-**math gl** math for webgl (matrix4, vector3, etc)
-**ts-loader** webpack helper to compile TypeScript
+**@types/webgl2** webgl2 for typescript.
+**math gl** math for webgl (matrix4, vector3, etc).
+**ts-loader** webpack helper to compile TypeScript.
 **typescript** languange programming.
 **webpack** compiler and packer to 1 large file Javascript.
-**webpack-cli** cli of webpack
+**webpack-cli** cli of webpack.
 
 ## check it out [here](https://main.d2igjn5sicv6cg.amplifyapp.com/)

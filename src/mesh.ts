@@ -56,7 +56,7 @@ export class Mesh {
         const gl = window.gl;
         // await this.shader.init("/shader/transform/shader.vert", "/shader/shader.frag");
         // await this.shader.init("/shader/texture/shader.vert", "/shader/texture/shader.frag");
-        await this.shader.init("/shader/camera/camera.vert", "/shader/texture/shader.frag");
+        await this.shader.init("/shader/camera/camera.vert", "/shader/texture/texture.frag");
 
         this.vao = gl.createVertexArray();
         gl.bindVertexArray(this.vao);

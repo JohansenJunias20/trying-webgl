@@ -1,5 +1,4 @@
-# WEBGL using TypeScript
-learning WEBGL and TypeScript to beat [Three.JS](https://threejs.org/) :v
+# WEBGL from Scratch using TypeScript
 
 ## progress
 ---
